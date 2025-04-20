@@ -274,3 +274,5 @@ def fetch_parking_from_osm(lat, lng, radius=5000):
 class ParkingListAPIView(generics.ListAPIView):
     queryset = Parking.objects.all()
     serializer_class = ParkingSerializer
+    def get_serializer_context(self):
+        return {'request': self.request}

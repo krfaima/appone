@@ -44,6 +44,9 @@ class Parking(models.Model):
     ville = models.CharField(max_length=100)
     nombre_total_places = models.PositiveIntegerField()
     places_disponibles = models.PositiveIntegerField()
+    # image_url = models.URLField(null=True, blank=True)  # pour l'affichage d'image
+    image = models.ImageField(upload_to='parkings/', blank=True, null=True)  # <-- bien indenté
+
 
     def __str__(self):
         return f"{self.nom} - {self.ville}"

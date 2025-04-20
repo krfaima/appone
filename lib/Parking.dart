@@ -5,6 +5,10 @@ class Parking {
   final int nombreTotalPlaces;
   final int placesDisponibles;
   final String? imageUrl;
+  final double latitude;
+  final double longitude;
+  double? distance; // ← Ajouté
+
 
   Parking({
     required this.id,
@@ -13,6 +17,9 @@ class Parking {
     required this.nombreTotalPlaces,
     required this.placesDisponibles,
     this.imageUrl,
+    required this.latitude,
+    required this.longitude,
+    this.distance,
   });
 
   factory Parking.fromJson(Map<String, dynamic> json) {
@@ -23,6 +30,9 @@ class Parking {
       nombreTotalPlaces: json['nombre_total_places'],
       placesDisponibles: json['places_disponibles'],
       imageUrl: json['image_url'],
+      distance: (json['distance_from_user'] ?? 0).toDouble(),
+      latitude: (json['latitude'] ?? 0).toDouble(),
+      longitude: (json['longitude'] ?? 0).toDouble(),
     );
   }
 }

@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import CustomUser
 from .models import Carpark
+from .models import Parking
 
 class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
@@ -23,4 +24,12 @@ class LoginSerializer(serializers.Serializer):
 class CarparkSerializer(serializers.ModelSerializer):
     class Meta:
         model = Carpark
+        fields = '__all__'
+        
+        # serializers.py
+
+
+class ParkingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Parking
         fields = '__all__'

@@ -35,3 +35,15 @@ class Carpark(models.Model):
     
     def __str__(self):
         return self.name
+
+
+
+
+class Parking(models.Model):
+    nom = models.CharField(max_length=100)
+    ville = models.CharField(max_length=100)
+    nombre_total_places = models.PositiveIntegerField()
+    places_disponibles = models.PositiveIntegerField()
+
+    def __str__(self):
+        return f"{self.nom} - {self.ville}"

@@ -4,6 +4,8 @@ from .views import RegisterView, VerifyEmailView, LoginView
 # Add these new imports
 from .views import nearby_carparks, get_route
 from .views import carparks  # Import the view for carparks
+from .views import ParkingListAPIView
+
 
 urlpatterns = [
     path('register/', RegisterView.as_view(), name='register'),
@@ -15,4 +17,6 @@ urlpatterns = [
         path('carparks/', carparks, name='carparks'),
     path('nearby-carparks/', nearby_carparks, name='nearby-carparks'),
     path('route/', get_route, name='route'),
+    path('parkings/', ParkingListAPIView.as_view(), name='parking-list'),
+
 ]

@@ -25,6 +25,8 @@ from rest_framework import status
 
 from .models import Carpark
 from .serializers import CarparkSerializer
+from .models import Parking
+from .serializers import ParkingSerializer
 
 User = get_user_model()
 
@@ -265,3 +267,10 @@ def fetch_parking_from_osm(lat, lng, radius=5000):
     except requests.exceptions.RequestException as e:
         print(f"Error fetching parking data from OpenStreetMap: {e}")
         return []
+    
+    # views.py
+
+
+class ParkingListAPIView(generics.ListAPIView):
+    queryset = Parking.objects.all()
+    serializer_class = ParkingSerializer

@@ -6,8 +6,10 @@ import '../models/carpark.dart';
 
 class CarparkService {
   // final String baseUrl = 'http://10.0.2.2:8000/api'; // Use this for Android emulator
-  // final String baseUrl = 'http://127.0.0.1:8000/accounts'; // Use this for iOS simulator
-  final String baseUrl = 'http://192.168.100.6:8000/accounts';
+  final String baseUrl = 'http://127.0.0.1:8000/accounts'; // Use this for iOS simulator
+  // final String baseUrl = 'http://192.168.100.6:8000/accounts';
+    // final String baseUrl = "http://172.18.128.1:8000/accounts/";
+
 
     // final String baseUrl = "http://192.168.100.12:8000/accounts/";
 

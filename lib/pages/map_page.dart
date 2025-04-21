@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
-import 'HomePage.dart'; // Assure-toi d'importer
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
+import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 
-class MapPage extends StatefulWidget {
+class MapPage extends StatelessWidget {
   final double userLat;
   final double userLng;
   final double parkingLat;
@@ -17,120 +18,57 @@ class MapPage extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<MapPage> createState() => _MapPageState();
-}
-
-class _MapPageState extends State<MapPage> {
-  late MapController controller;
-
-  @override
-  void initState() {
-    super.initState();
-    controller = MapController(
-      initMapWithUserPosition: null,
-      initPosition: GeoPoint(
-        latitude: widget.userLat,
-        longitude: widget.userLng,
-      ),
-    );
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _initAndDrawRoad(); // ✅ bien
-    });
-  }
-
-  Future<void> _initAndDrawRoad() async {
-    try {
-      controller.init();
-      debugPrint("Map initialized");
-
-      await controller.zoomToBoundingBox(
-        BoundingBox(
-          north: widget.userLat > widget.parkingLat
-              ? widget.userLat
-              : widget.parkingLat,
-          south: widget.userLat < widget.parkingLat
-              ? widget.userLat
-              : widget.parkingLat,
-          east: widget.userLng > widget.parkingLng
-              ? widget.userLng
-              : widget.parkingLng,
-          west: widget.userLng < widget.parkingLng
-              ? widget.userLng
-              : widget.parkingLng,
-        ),
-        paddinInPixel: 50, // ✅ correction ici
-      );
-      debugPrint("Zoom OK");
-
-      await drawRoadToParking();
-      debugPrint("Route dessinée");
-    } catch (e) {
-      debugPrint("Erreur dans initAndDrawRoad: $e");
-    }
-  }
-
-  Future<void> drawRoadToParking() async {
-    await controller.drawRoad(
-      GeoPoint(latitude: widget.userLat, longitude: widget.userLng),
-      GeoPoint(latitude: widget.parkingLat, longitude: widget.parkingLng),
-      roadType: RoadType.car,
-      roadOption: const RoadOption(
-        roadWidth: 10,
-        roadColor: Colors.blue,
-      ),
-    );
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final userPosition = LatLng(userLat, userLng);
+    final parkingPosition = LatLng(parkingLat, parkingLng);
+
     return Scaffold(
-      appBar: AppBar(title: const Text("Parking Map")),
-      body: OSMFlutter(
-        controller: controller,
-        osmOption: OSMOption(
-          zoomOption: ZoomOption(
-            initZoom: 14,
-            minZoomLevel: 8,
-            maxZoomLevel: 18,
-            stepZoom: 1.0,
-          ),
-          userLocationMarker: UserLocationMaker(
-            personMarker: MarkerIcon(
-              icon: Icon(Icons.person_pin_circle, color: Colors.blue, size: 60),
-            ),
-            directionArrowMarker: MarkerIcon(
-              icon: Icon(Icons.navigation, color: Colors.blue, size: 60),
-            ),
-          ),
-          roadConfiguration: RoadOption(
-            roadColor: Colors.blue,
-            roadWidth: 5,
-          ),
-          staticPoints: [
-            StaticPositionGeoPoint(
-              "parking",
-              MarkerIcon(
-                icon: Icon(Icons.location_on, color: Colors.red, size: 48),
-              ),
-              [
-                GeoPoint(
-                    latitude: widget.parkingLat, longitude: widget.parkingLng)
-              ],
-            ),
-          ],
-          userTrackingOption: const UserTrackingOption(
-            enableTracking: false,
-            unFollowUser: false,
-          ),
+      appBar: AppBar(
+        title: const Text('Carte du parking'),
+        backgroundColor: const Color.fromARGB(255, 159, 185, 230),
+      ),
+      body: FlutterMap(
+  options: MapOptions(
+    initialCenter: userPosition,
+    initialZoom: 14.0,
+  ),
+  children: [
+    TileLayer(
+      urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+      userAgentPackageName: 'com.example.appone',
+    ),
+    MarkerLayer(
+      markers: [
+        Marker(
+          point: userPosition,
+          width: 60,
+          height: 60,
+          child: const Icon(Icons.person_pin_circle,
+              color: Colors.blue, size: 40),
         ),
+        Marker(
+          point: parkingPosition,
+          width: 60,
+          height: 60,
+          child: const Icon(Icons.local_parking,
+              color: Colors.red, size: 40),
+        ),
+      ],
+    ),
+    PolylineLayer(
+      polylines: [
+        Polyline(
+          points: [userPosition, parkingPosition],
+          color: Colors.blue,
+          strokeWidth: 4.0,
+        ),
+      ],
+    ),
+
+          // Affiche le pointeur de localisation (optionnel)
+          CurrentLocationLayer(),
+        ],
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    controller.dispose();
-    super.dispose();
   }
 }

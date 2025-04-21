@@ -48,8 +48,8 @@ class ParkingSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Parking
-        fields = ['id', 'nom', 'ville', 'nombre_total_places', 'places_disponibles', 'image_url']
-
+        fields = '__all__'
+        
     def get_image_url(self, obj):
         request = self.context.get('request')
         if obj.image and hasattr(obj.image, 'url'):

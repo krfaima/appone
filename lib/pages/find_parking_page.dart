@@ -209,9 +209,6 @@ class _FindParkingPageState extends State<FindParkingPage> {
     );
   }).toList(),
 ),
-
-
-
                     if (_routePoints.isNotEmpty)
                       PolylineLayer(
                         polylines: [

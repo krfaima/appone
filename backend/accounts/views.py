@@ -10,7 +10,6 @@ from postmarker.core import PostmarkClient
 import random
 import string
 from datetime import timedelta
-
 from .serializers import RegisterSerializer, LoginSerializer
 
 from django.http import JsonResponse
@@ -23,8 +22,6 @@ import math
 import requests
 from rest_framework import status
 
-from .models import Carpark
-from .serializers import CarparkSerializer
 from .models import Parking
 from .serializers import ParkingSerializer
 
@@ -127,148 +124,9 @@ class LoginView(APIView):
 
 
 
-# filepath: c:\src\flutter_app\appone\backend\accounts\views.py
-@api_view(['GET'])
-def carparks(request):
-    carparks = Carpark.objects.all()
-    serializer = CarparkSerializer(carparks, many=True)
-    return Response(serializer.data)
-
-# Add these imports to your existing views.py
-# Add these new view functions
-
-@api_view(['GET'])
-def nearby_carparks(request):
-    try:
-        # Use the underlying Django HttpRequest object if needed
-        django_request = request._request
-
-        lat = float(request.query_params.get('lat'))
-        lng = float(request.query_params.get('lng'))
-    except (TypeError, ValueError):
-        return Response({'error': 'Invalid or missing latitude/longitude'}, status=400)
-
-    # Fetch parking data from OpenStreetMap
-    parking_locations = fetch_parking_from_osm(lat, lng, radius=5000)
-
-    # Sort parking locations by distance from the user
-    for parking in parking_locations:
-        parking['distance_from_user'] = calculate_distance(
-            lat, lng, parking['latitude'], parking['longitude']
-        )
-    parking_locations.sort(key=lambda x: x['distance_from_user'])
-
-    return Response(parking_locations)
-
-@api_view(['GET'])
-def get_route(request):
-    start_lat = request.query_params.get('start_lat')
-    start_lng = request.query_params.get('start_lng')
-    end_lat = request.query_params.get('end_lat')
-    end_lng = request.query_params.get('end_lng')
-    
-    # Use OpenRouteService for routing
-    headers = {
-        'Authorization': 'YOUR_OPENROUTE_API_KEY', # Replace with your API key
-        'Content-Type': 'application/json; charset=utf-8'
-    }
-    
-    body = {
-        "coordinates": [
-            [float(start_lng), float(start_lat)],
-            [float(end_lng), float(end_lat)]
-        ],
-        "format": "geojson"
-    }
-    
-    try:
-        response = requests.post(
-            'https://api.openrouteservice.org/v2/directions/driving-car/geojson',
-            json=body,
-            headers=headers
-        )
-        
-        if response.status_code == 200:
-            data = response.json()
-            # Extract coordinates from GeoJSON
-            coordinates = data['features'][0]['geometry']['coordinates']
-            # Swap lng/lat to lat/lng for Flutter
-            route_points = [[point[1], point[0]] for point in coordinates]
-            return Response(route_points)
-        else:
-            # Fallback to straight line if API fails
-            return Response([
-                [float(start_lat), float(start_lng)],
-                [float(end_lat), float(end_lng)]
-            ])
-    except Exception as e:
-        # Fallback to straight line if API fails
-        return Response([
-            [float(start_lat), float(start_lng)],
-            [float(end_lat), float(end_lng)]
-        ])
-
-def calculate_distance(lat1, lon1, lat2, lon2):
-    # Earth's radius in km
-    R = 6371.0
-    
-    # Convert to radians
-    lat1_rad = math.radians(lat1)
-    lon1_rad = math.radians(lon1)
-    lat2_rad = math.radians(lat2)
-    lon2_rad = math.radians(lon2)
-    
-    # Differences
-    dlon = lon2_rad - lon1_rad
-    dlat = lat2_rad - lat1_rad
-    
-    # Haversine formula
-    a = math.sin(dlat / 2)**2 + math.cos(lat1_rad) * math.cos(lat2_rad) * math.sin(dlon / 2)**2
-    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
-    distance = R * c
-    
-    return distance
 
 
 
-    
-
-def fetch_parking_from_osm(lat, lng, radius=5000):
-    """
-    Fetch parking locations from OpenStreetMap using the Overpass API.
-    :param lat: Latitude of the user's location
-    :param lng: Longitude of the user's location
-    :param radius: Search radius in meters (default: 5000 meters)
-    :return: List of parking locations
-    """
-    url = "https://overpass-api.de/api/interpreter"
-    query = f"""
-    [out:json];
-    node["amenity"="parking"](around:{radius},{lat},{lng});
-    out;
-    """
-    try:
-        response = requests.get(url, params={'data': query})
-        response.raise_for_status()  # Raise an error for bad HTTP responses
-        data = response.json()
-        parking_locations = []
-
-        # Extract parking data from the Overpass API response
-        for element in data.get('elements', []):
-            parking_locations.append({
-                'id': element.get('id'),
-                'latitude': element.get('lat'),
-                'longitude': element.get('lon'),
-                'name': element.get('tags', {}).get('name', 'Unnamed Parking'),
-                'type': element.get('tags', {}).get('parking', 'unknown'),
-            })
-
-        return parking_locations
-    except requests.exceptions.RequestException as e:
-        print(f"Error fetching parking data from OpenStreetMap: {e}")
-        return []
-    
-    # views.py
 
 
 class ParkingListAPIView(generics.ListAPIView):
@@ -276,3 +134,4 @@ class ParkingListAPIView(generics.ListAPIView):
     serializer_class = ParkingSerializer
     def get_serializer_context(self):
         return {'request': self.request}
+    

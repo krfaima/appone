@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from .models import CustomUser
-from .models import Carpark
 from .models import Parking
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -20,28 +19,10 @@ class LoginSerializer(serializers.Serializer):
 
 
 
-        # Add this to your existing serializers.py
-class CarparkSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Carpark
-        fields = '__all__'
-        
-        # serializers.py
 
 
-# class ParkingSerializer(serializers.ModelSerializer):
-    
-#     class Meta:
-#         model = Parking
-#         fields = '__all__'
-        
-#          def get_image_url(self, obj):
-#         request = self.context.get('request')
-#         if obj.image and hasattr(obj.image, 'url'):
-#             return request.build_absolute_uri(obj.image.url)
-#         return None
-# from rest_framework import serializers
-# from .models import Parking
+
+
 
 class ParkingSerializer(serializers.ModelSerializer):
     image_url = serializers.SerializerMethodField()

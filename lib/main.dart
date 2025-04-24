@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'register_page.dart';
-import 'pages/find_parking_page.dart'; // 👈 Import the Find Parking page
 
 
 void main() {
@@ -24,7 +23,6 @@ class MyApp extends StatelessWidget {
         '/': (context) => const SplashScreen(),
         '/onboarding': (context) => const OnboardingScreen(),
         '/register': (context) => RegisterPage(),
-        '/find_parking': (context) => const FindParkingPage(), // 👈 Add the route
       },
     );
   }

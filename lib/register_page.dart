@@ -73,12 +73,7 @@ class _RegisterPageState extends State<RegisterPage> {
             SizedBox(height: 20),
 
             // ✅ Ajout du bouton "Find Parking"
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushNamed(context, '/find_parking');
-              },
-              child: Text("Find Parking"),
-            ),
+           
           ],
         ),
       ),
